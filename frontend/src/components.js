@@ -24,27 +24,29 @@ const mockStockData = [
   { company: "ONGC", marketCap: "198765", sector: "Oil & Gas", price: "178.90", dataQuality: "High", change1d: "-4.89", change5d: "-8.12", change10d: "-13.45", change15d: "-18.67", change20d: "-15.23", change30d: "-20.56", volume: "10987654" },
 ];
 
-const mockTopGainers = [
-  { company: "Adani Enterprises", marketCap: "543219", sector: "Conglomerate", price: "2345.67", change: "+12.45", volume: "18765432" },
-  { company: "Zomato", marketCap: "123456", sector: "Food Delivery", price: "189.45", change: "+8.90", volume: "25678901" },
-  { company: "Paytm", marketCap: "234567", sector: "Fintech", price: "567.89", change: "+7.34", volume: "19876543" },
-  { company: "Nykaa", marketCap: "156789", sector: "E-commerce", price: "234.56", change: "+6.78", volume: "8765432" },
-  { company: "PolicyBazaar", marketCap: "187654", sector: "Insurance", price: "456.78", change: "+5.67", volume: "6789123" },
-  { company: "Infosys", marketCap: "876543", sector: "IT Services", price: "1789.30", change: "+3.12", volume: "6789123" },
-  { company: "State Bank of India", marketCap: "432109", sector: "Banking", price: "723.45", change: "+2.67", volume: "13456789" },
-  { company: "Reliance Industries", marketCap: "1845673", sector: "Oil & Gas", price: "2456.75", change: "+2.45", volume: "12456789" },
-];
+const mockTopGainers = mockStockData
+  .filter(stock => parseFloat(stock.change1d) > 0)
+  .sort((a, b) => parseFloat(b.change1d) - parseFloat(a.change1d))
+  .map(stock => ({
+    company: stock.company,
+    marketCap: stock.marketCap,
+    sector: stock.sector,
+    price: stock.price,
+    change: stock.change1d,
+    volume: stock.volume
+  }));
 
-const mockTopLosers = [
-  { company: "Vedanta", marketCap: "345678", sector: "Mining", price: "234.56", change: "-8.90", volume: "22345678" },
-  { company: "Tata Steel", marketCap: "298765", sector: "Steel", price: "123.45", change: "-7.34", volume: "16789123" },
-  { company: "JSW Steel", marketCap: "267891", sector: "Steel", price: "678.90", change: "-6.78", volume: "14567890" },
-  { company: "Coal India", marketCap: "234567", sector: "Mining", price: "345.67", change: "-5.67", volume: "12345678" },
-  { company: "ONGC", marketCap: "198765", sector: "Oil & Gas", price: "178.90", change: "-4.89", volume: "10987654" },
-  { company: "Bharti Airtel", marketCap: "654321", sector: "Telecom", price: "894.60", change: "-2.30", volume: "11234567" },
-  { company: "Asian Paints", marketCap: "298765", sector: "Chemicals", price: "2987.65", change: "-1.45", volume: "4567891" },
-  { company: "HDFC Bank", marketCap: "987654", sector: "Banking", price: "1567.85", change: "-0.75", volume: "15678901" },
-];
+const mockTopLosers = mockStockData
+  .filter(stock => parseFloat(stock.change1d) < 0)
+  .sort((a, b) => parseFloat(a.change1d) - parseFloat(b.change1d))
+  .map(stock => ({
+    company: stock.company,
+    marketCap: stock.marketCap,
+    sector: stock.sector,
+    price: stock.price,
+    change: stock.change1d,
+    volume: stock.volume
+  }));
 
 const mockNews = [
   "OLA Q1 results announced - Revenue up 23% YoY",
@@ -56,7 +58,7 @@ const mockNews = [
 
 const sectors = ["All Sectors", "Banking", "IT Services", "Oil & Gas", "FMCG", "Telecom", "Construction", "Chemicals", "Mining", "Steel", "Conglomerate", "Food Delivery", "Fintech", "E-commerce", "Insurance"];
 
-// Components
+// Header Component
 export const Header = ({ currentPage, setCurrentPage }) => {
   return (
     <header className="bg-gray-900 shadow-2xl sticky top-0 z-50 border-b border-green-500">
@@ -93,6 +95,16 @@ export const Header = ({ currentPage, setCurrentPage }) => {
               Updates
             </button>
             <button 
+              onClick={() => setCurrentPage('search')}
+              className={`px-3 py-1 rounded text-sm font-medium transition-all duration-300 ${
+                currentPage === 'search' 
+                ? 'bg-green-500 text-black' 
+                : 'text-green-400 hover:text-green-300 hover:bg-gray-800'
+              }`}
+            >
+              Search
+            </button>
+            <button 
               onClick={() => setCurrentPage('terminal')}
               className="text-green-400 hover:text-green-300 px-3 py-1 text-sm"
             >
@@ -108,140 +120,134 @@ export const Header = ({ currentPage, setCurrentPage }) => {
   );
 };
 
+// New Unique Hero Section Design
 export const HeroSection = () => {
+  const [activeCard, setActiveCard] = useState(0);
+  const cards = [
+    { title: "13.7%", subtitle: "Indians have demat accounts", color: "from-red-500 to-pink-500" },
+    { title: "60%", subtitle: "Americans invest in stocks", color: "from-blue-500 to-cyan-500" },
+    { title: "10x", subtitle: "India's growth potential", color: "from-green-500 to-emerald-500" },
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveCard((prev) => (prev + 1) % cards.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <section className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 overflow-hidden">
-      <div className="absolute inset-0 opacity-20">
-        <img 
-          src="https://images.unsplash.com/photo-1639768939489-025b90ba9f23?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDJ8MHwxfHNlYXJjaHwyfHxmaW5hbmNpYWwlMjBjaGFydHN8ZW58MHx8fGJsdWV8MTc1Mjk1Njc4OXww&ixlib=rb-4.1.0&q=85" 
-          alt="Financial Background"
-          className="w-full h-full object-cover"
-        />
+    <section className="min-h-screen bg-black text-white relative overflow-hidden">
+      {/* Animated Grid Background */}
+      <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-900 opacity-90"></div>
+        <div className="grid grid-cols-12 grid-rows-8 h-full w-full opacity-10">
+          {Array.from({ length: 96 }).map((_, i) => (
+            <div key={i} className={`border-r border-b border-green-500 ${i % 7 === 0 ? 'bg-green-500/5' : ''}`}></div>
+          ))}
+        </div>
       </div>
-      
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-32">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div className="text-white space-y-8">
-            <div className="space-y-6">
-              <h1 className="text-5xl lg:text-7xl font-bold leading-tight bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
-                Stop Guessing. Start Analyzing.
+
+      {/* Floating Particles */}
+      <div className="absolute inset-0">
+        {Array.from({ length: 20 }).map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 bg-green-400 rounded-full animate-pulse"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 2}s`,
+              animationDuration: `${2 + Math.random() * 2}s`
+            }}
+          ></div>
+        ))}
+      </div>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-32">
+        <div className="text-center mb-16">
+          <div className="inline-block mb-8">
+            <div className="bg-gradient-to-r from-green-400 to-blue-500 text-transparent bg-clip-text">
+              <h1 className="text-6xl md:text-8xl font-black leading-none tracking-tighter">
+                MARKET
               </h1>
-              <div className="space-y-4 text-lg lg:text-xl leading-relaxed">
-                <p className="flex items-center space-x-3">
-                  <span className="text-2xl">🌏</span>
-                  <span>A Growing Economy Like India Offers Endless Opportunities</span>
-                </p>
-                <p className="flex items-center space-x-3">
-                  <span className="text-2xl">📊</span>
-                  <span>Only 13.7% of Indians have a demat account</span>
-                </p>
-                <p className="flex items-center space-x-3">
-                  <span className="text-2xl">🇺🇸</span>
-                  <span>But over 60% of Americans invest in the stock market</span>
-                </p>
-                <p className="flex items-center space-x-3">
-                  <span className="text-2xl">💡</span>
-                  <span>India is still growing—you're early, not late</span>
-                </p>
+              <h1 className="text-6xl md:text-8xl font-black leading-none tracking-tighter">
+                DECODED
+              </h1>
+            </div>
+          </div>
+          
+          <div className="max-w-3xl mx-auto mb-12">
+            <p className="text-xl md:text-2xl text-gray-300 leading-relaxed">
+              Stop gambling with your money. Start investing with{' '}
+              <span className="text-green-400 font-bold">data-driven insights</span> that actually matter.
+            </p>
+          </div>
+
+          {/* Animated Statistics Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            {cards.map((card, index) => (
+              <div
+                key={index}
+                className={`relative p-8 rounded-2xl border-2 transition-all duration-700 ${
+                  activeCard === index 
+                    ? 'border-green-500 bg-gray-900/50 scale-105' 
+                    : 'border-gray-700 bg-gray-900/20 hover:border-green-500/50'
+                }`}
+              >
+                <div className={`absolute inset-0 bg-gradient-to-br ${card.color} opacity-${activeCard === index ? '20' : '5'} rounded-2xl`}></div>
+                <div className="relative z-10">
+                  <div className="text-4xl md:text-6xl font-black text-white mb-2">
+                    {card.title}
+                  </div>
+                  <div className="text-gray-400 text-sm md:text-base">
+                    {card.subtitle}
+                  </div>
+                </div>
               </div>
+            ))}
+          </div>
+
+          {/* CTA Section */}
+          <div className="space-y-6">
+            <div className="text-lg text-gray-400 mb-6">
+              India's next decade will create more millionaires than the last century.
             </div>
-            
-            <div className="bg-gradient-to-r from-blue-800/50 to-indigo-800/50 backdrop-blur-lg p-8 rounded-2xl border border-blue-400/20 shadow-2xl">
-              <p className="text-xl lg:text-2xl leading-relaxed mb-6">
-                In a market like India, investing isn't gambling—<br/>
-                it's the gateway to financial freedom for the middle class.<br/>
-                It's the only place where a ₹10 idea can become ₹2 lakh,<br/>
-                or a ₹2 lakh business is sold at 80% off—to those who know where to look.
-              </p>
-              <p className="text-lg flex items-center space-x-3">
-                <span className="text-2xl">🕰️</span>
-                <span className="font-semibold">So the best time to invest in India... is the next decade.</span>
-              </p>
-            </div>
-            
-            <button className="bg-gradient-to-r from-green-500 to-green-600 text-white px-12 py-4 rounded-xl font-bold text-xl hover:from-green-600 hover:to-green-700 transition-all duration-300 shadow-2xl transform hover:scale-105 hover:shadow-green-500/25">
-              Start Your Investment Journey
+            <button className="group relative px-12 py-4 bg-green-500 text-black font-bold text-xl rounded-xl overflow-hidden transition-all duration-300 hover:bg-green-400 hover:scale-105 hover:shadow-2xl hover:shadow-green-500/25">
+              <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <span className="relative z-10">START ANALYZING NOW</span>
             </button>
           </div>
-          
-          <div className="hidden lg:block">
-            <img 
-              src="https://images.unsplash.com/photo-1643962578875-90e5e275d449?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDJ8MHwxfHNlYXJjaHwzfHxmaW5hbmNpYWwlMjBjaGFydHN8ZW58MHx8fGJsdWV8MTc1Mjk1Njc4OXww&ixlib=rb-4.1.0&q=85" 
-              alt="Stock Market Analysis"
-              className="w-full h-auto rounded-2xl shadow-2xl border border-blue-400/20"
-            />
-          </div>
         </div>
-      </div>
-    </section>
-  );
-};
 
-export const EngagementSection = () => {
-  return (
-    <section className="py-20 bg-gray-50">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-8">
-            The Problem with Stock Market Advice
-          </h2>
-          <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-            You're not alone. Most people don't invest—not because they don't want to grow their wealth,
-            but because they don't know how to choose the right stocks.
-          </p>
-        </div>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div className="space-y-8 text-lg text-gray-700 leading-relaxed">
-            <p className="text-2xl font-semibold text-blue-900">That's where we come in.</p>
-            <p>We don't make bold claims. We don't chase headlines. And we definitely don't tell you which stock will be the next multibagger.</p>
-            
-            <div className="bg-red-50 border-l-4 border-red-500 p-6 rounded-r-lg">
-              <p className="flex items-start space-x-3">
-                <span className="text-red-500 font-bold text-xl">❌</span>
-                <span>If someone says, "This stock will surely 10x," there's a high chance the opposite is already in motion.</span>
-              </p>
-            </div>
-            
-            <div className="bg-green-50 border-l-4 border-green-500 p-6 rounded-r-lg">
-              <p className="flex items-start space-x-3">
-                <span className="text-green-500 font-bold text-xl">✅</span>
-                <span className="font-semibold">The first rule of smart investing: Be skeptical of hype.</span>
-              </p>
-            </div>
-          </div>
-          
-          <div className="bg-white p-8 rounded-2xl shadow-xl border border-gray-200">
-            <h3 className="text-3xl font-bold text-gray-900 mb-6">What We Do</h3>
-            <p className="text-lg text-gray-600 mb-6">We break down what's happening in the market—simply and honestly</p>
-            
-            <div className="space-y-4">
-              <div className="flex items-start space-x-3">
-                <span className="text-2xl">🚗</span>
-                <p className="text-gray-700">Ola's stock crashed over 70% despite being India's first EV IPO</p>
+        {/* Bottom Terminal Preview */}
+        <div className="mt-20 max-w-4xl mx-auto">
+          <div className="bg-gray-900 rounded-lg border border-green-500 overflow-hidden">
+            <div className="bg-gray-800 px-4 py-2 flex items-center justify-between border-b border-green-500">
+              <div className="flex space-x-2">
+                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
               </div>
-              <div className="flex items-start space-x-3">
-                <span className="text-2xl">📈</span>
-                <p className="text-gray-700">Why a 20% rally in a weak stock doesn't always mean a comeback</p>
+              <span className="text-green-400 text-sm font-mono">StockTracker Terminal</span>
+            </div>
+            <div className="p-6 font-mono text-sm">
+              <div className="text-green-400">
+                <span className="text-green-500">trader@stocktracker:~$</span> analyze --market --live
+              </div>
+              <div className="text-green-300 mt-2">
+                Initializing market analysis...
+              </div>
+              <div className="text-blue-400 mt-1">
+                ✓ Loading 500+ stocks from NSE/BSE
+              </div>
+              <div className="text-yellow-400 mt-1">
+                ✓ Processing real-time data streams
+              </div>
+              <div className="text-green-400 mt-1">
+                ✓ Ready for analysis
               </div>
             </div>
-            
-            <div className="mt-8 p-6 bg-blue-50 rounded-lg">
-              <p className="text-blue-800 font-semibold">We help you understand the bigger picture, so you can make your own calls</p>
-            </div>
-            
-            <div className="mt-6 p-6 bg-yellow-50 rounded-lg border-l-4 border-yellow-400">
-              <p className="flex items-start space-x-3">
-                <span className="text-yellow-600 font-bold text-xl">⚠️</span>
-                <span className="text-yellow-800">
-                  We don't encourage trading, futures, or options — <strong>93% of people lose money in F&O</strong>
-                </span>
-              </p>
-            </div>
-            
-            <p className="mt-6 text-lg text-gray-700 font-medium">
-              We're just your starting point. A guide to the market. No noise. No shortcuts. Just the right foundation to start your investing journey.
-            </p>
           </div>
         </div>
       </div>
@@ -280,219 +286,45 @@ export const ScrollingNews = () => {
   );
 };
 
-export const ConvinceSection = () => {
-  return (
-    <section className="py-20 bg-gradient-to-br from-gray-900 to-gray-800 text-white">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl lg:text-5xl font-bold mb-8">
-            Our Only Promise: We Don't Make Promises
-          </h2>
-        </div>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div className="space-y-8">
-            <div className="space-y-4 text-lg leading-relaxed">
-              <div className="flex items-start space-x-3">
-                <span className="text-green-400 font-bold text-xl">✅</span>
-                <span>No claims. No predictions. No hype.</span>
-              </div>
-              <p>We're skeptical by default—and that's our USP.</p>
-              <p>We only share publicly available information and encourage you to do your own research.</p>
-            </div>
-            
-            <div className="bg-red-900/30 border border-red-400 p-8 rounded-xl">
-              <h3 className="text-2xl font-bold text-red-400 mb-4">
-                <span className="text-3xl mr-3">⚠️</span>
-                Don't trust us blindly.
-              </h3>
-              <p className="text-xl">
-                Yes—don't. Just try us out. Free of charge. See the data. Think for yourself.
-              </p>
-            </div>
-          </div>
-          
-          <div>
-            <img 
-              src="https://images.unsplash.com/photo-1660020619062-70b16c44bf0f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHwxfHxpbnZlc3RtZW50JTIwZGFzaGJvYXJkfGVufDB8fHxibHVlfDE3NTI5NTY3OTd8MA&ixlib=rb-4.1.0&q=85" 
-              alt="Investment Dashboard"
-              className="w-full h-auto rounded-2xl shadow-2xl border border-gray-600"
-            />
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
+export const FeatureSection = () => {
+  const features = [
+    {
+      title: "No Predictions. Just Facts.",
+      description: "We don't tell you what will happen. We show you what already happened and let you decide.",
+      icon: "📊"
+    },
+    {
+      title: "93% Lose in F&O",
+      description: "We won't encourage trading or futures. We focus on long-term wealth building through smart analysis.",
+      icon: "⚠️"
+    },
+    {
+      title: "India is Early",
+      description: "While others chase developed markets, we help you capitalize on India's growth story.",
+      icon: "🇮🇳"
+    }
+  ];
 
-export const HowItWorksSection = () => {
-  return (
-    <section className="py-20 bg-white">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-8">
-            How Our Analysis Works
-          </h2>
-          <p className="text-xl text-gray-600 max-w-4xl mx-auto">
-            We help you understand how the market actually reacted—not how people say it will.
-          </p>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <div className="bg-blue-50 p-8 rounded-xl border border-blue-200 hover:shadow-lg transition-shadow">
-            <div className="text-4xl mb-4">🔍</div>
-            <h3 className="text-xl font-bold text-blue-900 mb-4">1. Market Reaction Scanner</h3>
-            <p className="text-gray-700">
-              At the end of each trading day, our system scans how the market behaved—tracking stock movements, volumes, news events, and sector rotations.
-            </p>
-          </div>
-          
-          <div className="bg-green-50 p-8 rounded-xl border border-green-200 hover:shadow-lg transition-shadow">
-            <div className="text-4xl mb-4">📊</div>
-            <h3 className="text-xl font-bold text-green-900 mb-4">2. Statistical Insights</h3>
-            <p className="text-gray-700">
-              Instead of giving you "buy/sell calls," we show what the data actually says—Was it a broad market rally? Was the volume real? Which sectors moved?
-            </p>
-          </div>
-          
-          <div className="bg-purple-50 p-8 rounded-xl border border-purple-200 hover:shadow-lg transition-shadow">
-            <div className="text-4xl mb-4">📈</div>
-            <h3 className="text-xl font-bold text-purple-900 mb-4">3. Company-Level Breakdowns</h3>
-            <p className="text-gray-700">
-              We highlight key movements in companies—including fundamentals, financials, and recent developments. No filters, no sugarcoating.
-            </p>
-          </div>
-          
-          <div className="bg-orange-50 p-8 rounded-xl border border-orange-200 hover:shadow-lg transition-shadow">
-            <div className="text-4xl mb-4">🧮</div>
-            <h3 className="text-xl font-bold text-orange-900 mb-4">4. Tools for Analysis</h3>
-            <p className="text-gray-700">
-              We give you access to tables, visual tools, and filters—so you can analyze the data and draw your own conclusions.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
-
-export const PreviewSection = ({ setCurrentPage }) => {
   return (
     <section className="py-20 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-8">
-            See Our Analysis in Action
+          <h2 className="text-4xl font-bold text-gray-900 mb-6">
+            Why We're Different
           </h2>
-          <p className="text-xl text-gray-600">
-            Get a preview of our comprehensive stock analysis dashboard
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Most platforms sell you dreams. We sell you reality.
           </p>
         </div>
         
-        <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
-          <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-6">
-            <div className="flex items-center justify-between">
-              <h3 className="text-2xl font-bold">Analysis Results Preview</h3>
-              <span className="bg-blue-500 px-3 py-1 rounded-full text-sm">Live Data Available</span>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {features.map((feature, index) => (
+            <div key={index} className="bg-white p-8 rounded-xl shadow-lg border-l-4 border-blue-500 hover:shadow-xl transition-shadow">
+              <div className="text-4xl mb-4">{feature.icon}</div>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">{feature.title}</h3>
+              <p className="text-gray-600 leading-relaxed">{feature.description}</p>
             </div>
-          </div>
-          
-          <div className="p-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-              <div className="bg-green-50 p-6 rounded-lg border border-green-200">
-                <h4 className="font-semibold text-green-800 mb-2">Top Gainers</h4>
-                <div className="space-y-2">
-                  {mockTopGainers.slice(0, 3).map((stock, index) => (
-                    <div key={index} className="flex justify-between">
-                      <span className="text-sm text-gray-700">{stock.company}</span>
-                      <span className="text-sm font-semibold text-green-600">{stock.change}%</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              
-              <div className="bg-red-50 p-6 rounded-lg border border-red-200">
-                <h4 className="font-semibold text-red-800 mb-2">Top Losers</h4>
-                <div className="space-y-2">
-                  {mockTopLosers.slice(0, 3).map((stock, index) => (
-                    <div key={index} className="flex justify-between">
-                      <span className="text-sm text-gray-700">{stock.company}</span>
-                      <span className="text-sm font-semibold text-red-600">{stock.change}%</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              
-              <div className="bg-blue-50 p-6 rounded-lg border border-blue-200">
-                <h4 className="font-semibold text-blue-800 mb-2">Market Overview</h4>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-700">Data Range:</span>
-                    <span className="font-medium">19 Jun - 19 Jul 2025</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-700">Trading Days:</span>
-                    <span className="font-medium">22 days</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-700">Last Updated:</span>
-                    <span className="font-medium">19 Jul 2025</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse border border-gray-300">
-                <thead>
-                  <tr className="bg-gray-100">
-                    <th className="border border-gray-300 px-4 py-3 text-left">Company</th>
-                    <th className="border border-gray-300 px-4 py-3 text-left">Market Cap (Cr)</th>
-                    <th className="border border-gray-300 px-4 py-3 text-left">Sector</th>
-                    <th className="border border-gray-300 px-4 py-3 text-left">Latest Price</th>
-                    <th className="border border-gray-300 px-4 py-3 text-left">1D Change %</th>
-                    <th className="border border-gray-300 px-4 py-3 text-left">5D Change %</th>
-                    <th className="border border-gray-300 px-4 py-3 text-left">30D Change %</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {mockStockData.slice(0, 10).map((stock, index) => (
-                    <tr key={index} className="hover:bg-gray-50">
-                      <td className="border border-gray-300 px-4 py-3 font-medium text-blue-600 cursor-pointer hover:underline">
-                        {stock.company}
-                      </td>
-                      <td className="border border-gray-300 px-4 py-3">₹{stock.marketCap}</td>
-                      <td className="border border-gray-300 px-4 py-3">{stock.sector}</td>
-                      <td className="border border-gray-300 px-4 py-3">₹{stock.price}</td>
-                      <td className={`border border-gray-300 px-4 py-3 ${stock.change1d.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>
-                        {stock.change1d}%
-                      </td>
-                      <td className={`border border-gray-300 px-4 py-3 ${stock.change5d.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>
-                        {stock.change5d}%
-                      </td>
-                      <td className={`border border-gray-300 px-4 py-3 ${stock.change30d.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>
-                        {stock.change30d}%
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            
-            <div className="mt-6 text-center">
-              <div className="space-x-4">
-                <button 
-                  onClick={() => setCurrentPage('terminal')}
-                  className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-                >
-                  View Full Analysis
-                </button>
-                <button className="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors">
-                  Get Started
-                </button>
-              </div>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </section>
@@ -501,41 +333,17 @@ export const PreviewSection = ({ setCurrentPage }) => {
 
 export const CTASection = () => {
   return (
-    <section className="py-20 bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 text-white relative overflow-hidden">
-      <div className="absolute inset-0 opacity-10">
-        <img 
-          src="https://images.unsplash.com/photo-1586448681913-2fc1b29c5cca?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHwzfHxpbnZlc3RtZW50JTIwZGFzaGJvYXJkfGVufDB8fHxibHVlfDE3NTI5NTY3OTd8MA&ixlib=rb-4.1.0&q=85" 
-          alt="Financial Data"
-          className="w-full h-full object-cover"
-        />
-      </div>
-      
+    <section className="py-20 bg-black text-white relative">
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-black opacity-90"></div>
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 className="text-4xl lg:text-6xl font-bold mb-8">
-          Ready to Make Informed Investment Decisions?
+        <h2 className="text-4xl md:text-6xl font-bold mb-8">
+          Ready to Stop Guessing?
         </h2>
-        <p className="text-xl lg:text-2xl text-blue-200 mb-12 leading-relaxed">
-          Join thousands of smart investors who trust our data-driven approach to market analysis.
-          Start your journey with comprehensive stock insights today.
+        <p className="text-xl text-gray-300 mb-12">
+          Join the smart money. Start with data, not hope.
         </p>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-          <div className="bg-white/10 backdrop-blur-lg p-6 rounded-xl border border-blue-400/20">
-            <h3 className="text-xl font-bold mb-2">Live Data</h3>
-            <p className="text-blue-200">Real-time stock prices and market movements</p>
-          </div>
-          <div className="bg-white/10 backdrop-blur-lg p-6 rounded-xl border border-blue-400/20">
-            <h3 className="text-xl font-bold mb-2">Advanced Analytics</h3>
-            <p className="text-blue-200">Comprehensive filtering and analysis tools</p>
-          </div>
-          <div className="bg-white/10 backdrop-blur-lg p-6 rounded-xl border border-blue-400/20">
-            <h3 className="text-xl font-bold mb-2">Market Insights</h3>
-            <p className="text-blue-200">Daily market reports and sector analysis</p>
-          </div>
-        </div>
-        
-        <button className="bg-gradient-to-r from-green-500 to-green-600 text-white px-12 py-4 rounded-xl font-bold text-xl hover:from-green-600 hover:to-green-700 transition-all duration-300 shadow-2xl transform hover:scale-105">
-          Start Analyzing Now
+        <button className="bg-green-500 text-black px-12 py-4 rounded-xl font-bold text-xl hover:bg-green-400 transition-all duration-300 shadow-2xl transform hover:scale-105">
+          Access Terminal Now
         </button>
       </div>
     </section>
@@ -593,8 +401,8 @@ export const Footer = () => {
   );
 };
 
-// Top Gainers/Losers Table Component
-export const MarketMoversTable = ({ data, title, type, setSelectedCompany, setCurrentPage }) => {
+// Market Movers Table Component with Click to Show
+export const MarketMoversTable = ({ data, title, type, setSelectedCompany, setCurrentPage, isVisible, onToggle }) => {
   const [displayCount, setDisplayCount] = useState(10);
   const [currentPage, setPage] = useState(1);
   const [sortBy, setSortBy] = useState('change');
@@ -602,6 +410,20 @@ export const MarketMoversTable = ({ data, title, type, setSelectedCompany, setCu
   const [sectorFilter, setSectorFilter] = useState('All Sectors');
   const [minMarketCap, setMinMarketCap] = useState('');
   const [maxMarketCap, setMaxMarketCap] = useState('');
+  
+  if (!isVisible) {
+    return (
+      <div className="bg-gray-900 border border-green-500 rounded">
+        <button 
+          onClick={onToggle}
+          className="w-full bg-gray-800 px-4 py-3 border-b border-green-500 flex justify-between items-center hover:bg-gray-700 transition-colors"
+        >
+          <h3 className="text-green-500 font-bold">{title}</h3>
+          <span className="text-green-400 text-sm">Click to view →</span>
+        </button>
+      </div>
+    );
+  }
   
   const filteredData = data
     .filter(stock => {
@@ -643,14 +465,22 @@ export const MarketMoversTable = ({ data, title, type, setSelectedCompany, setCu
   
   const handleCompanyClick = (companyName) => {
     setSelectedCompany(companyName);
-    setCurrentPage('company');
+    setCurrentPage('search');
   };
   
   return (
     <div className="bg-gray-900 text-green-400 rounded border border-green-500 font-mono">
       <div className="bg-gray-800 px-4 py-3 border-b border-green-500 flex justify-between items-center">
         <h3 className="text-green-500 font-bold">{title}</h3>
-        <span className="text-xs text-green-300">{filteredData.length} stocks</span>
+        <div className="flex items-center space-x-2">
+          <span className="text-xs text-green-300">{filteredData.length} stocks</span>
+          <button 
+            onClick={onToggle}
+            className="text-green-400 hover:text-green-300 text-sm"
+          >
+            Hide ×
+          </button>
+        </div>
       </div>
       
       {/* Filters */}

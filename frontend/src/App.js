@@ -4,11 +4,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import {
   Header,
   HeroSection,
-  EngagementSection,
   ScrollingNews,
-  ConvinceSection,
-  HowItWorksSection,
-  PreviewSection,
+  FeatureSection,
   CTASection,
   Footer,
   MarketMoversTable
@@ -64,23 +61,12 @@ const mockTopLosers = mockStockData
 
 const sectors = ["All Sectors", "Banking", "IT Services", "Oil & Gas", "FMCG", "Telecom", "Construction", "Chemicals", "Mining", "Steel", "Conglomerate", "Food Delivery", "Fintech", "E-commerce", "Insurance"];
 
-// Terminal Page Component
-const TerminalPage = ({ setCurrentPage, setSelectedCompany }) => {
-  const [searchTerm, setSearchTerm] = useState('');
-  
-  const filteredStocks = mockStockData.filter(stock =>
-    stock.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    stock.sector.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const stockSuggestions = mockStockData
-    .filter(stock => stock.company.toLowerCase().includes(searchTerm.toLowerCase()))
-    .slice(0, 5);
-
-  const handleCompanyClick = (companyName) => {
-    setSelectedCompany(companyName);
-    setCurrentPage('company');
-  };
+// Updates Page Component (no search, click to show tables)
+const UpdatesPage = ({ setCurrentPage, setSelectedCompany }) => {
+  const [showGainers, setShowGainers] = useState(false);
+  const [showLosers, setShowLosers] = useState(false);
+  const [startDate, setStartDate] = useState('2025-06-19');
+  const [endDate, setEndDate] = useState('2025-07-19');
 
   return (
     <div className="min-h-screen bg-black text-green-400 font-mono">
@@ -92,41 +78,13 @@ const TerminalPage = ({ setCurrentPage, setSelectedCompany }) => {
             <p className="text-sm text-green-300">Analysis based on pre-loaded NSE/BSE stock data</p>
           </div>
           <div className="text-xs text-green-300">
-            <div>Data Available: 19 Jun 2025 to 19 Jul 2025 (22 trading days)</div>
+            <div>Data Available: {startDate} to {endDate} (22 trading days)</div>
             <div>Last updated: 19 Jul 2025</div>
           </div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-6">
-        {/* Search Bar */}
-        <div className="mb-6 relative">
-          <div className="flex items-center">
-            <span className="text-green-500 mr-2">trader@stocktracker:~$</span>
-            <input
-              type="text"
-              placeholder="search --company --financials"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="bg-black border border-green-500 text-green-400 px-3 py-1 rounded flex-1 focus:ring-1 focus:ring-green-500 focus:outline-none placeholder-green-600"
-            />
-          </div>
-          {searchTerm && stockSuggestions.length > 0 && (
-            <div className="absolute top-full left-0 w-full bg-gray-900 border border-green-500 rounded mt-1 z-10">
-              {stockSuggestions.map((stock, index) => (
-                <div 
-                  key={index}
-                  className="px-4 py-2 hover:bg-gray-800 cursor-pointer border-b border-gray-800 last:border-b-0"
-                  onClick={() => setSearchTerm(stock.company)}
-                >
-                  <div className="font-semibold text-green-400">{stock.company}</div>
-                  <div className="text-xs text-blue-400">{stock.sector}</div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
         {/* Market Overview */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <div className="bg-gray-900 border border-green-500 rounded">
@@ -149,26 +107,27 @@ const TerminalPage = ({ setCurrentPage, setSelectedCompany }) => {
             </div>
           </div>
 
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
             <MarketMoversTable 
               data={mockTopGainers} 
               title="TOP_GAINERS.csv" 
               type="gainers"
               setSelectedCompany={setSelectedCompany}
               setCurrentPage={setCurrentPage}
+              isVisible={showGainers}
+              onToggle={() => setShowGainers(!showGainers)}
+            />
+            
+            <MarketMoversTable 
+              data={mockTopLosers} 
+              title="TOP_LOSERS.csv" 
+              type="losers"
+              setSelectedCompany={setSelectedCompany}
+              setCurrentPage={setCurrentPage}
+              isVisible={showLosers}
+              onToggle={() => setShowLosers(!showLosers)}
             />
           </div>
-        </div>
-
-        {/* Top Losers */}
-        <div className="mb-8">
-          <MarketMoversTable 
-            data={mockTopLosers} 
-            title="TOP_LOSERS.csv" 
-            type="losers"
-            setSelectedCompany={setSelectedCompany}
-            setCurrentPage={setCurrentPage}
-          />
         </div>
 
         {/* Analysis Filters */}
@@ -179,12 +138,22 @@ const TerminalPage = ({ setCurrentPage, setSelectedCompany }) => {
           <div className="p-4">
             <div className="grid grid-cols-1 md:grid-cols-6 gap-4 text-xs">
               <div>
-                <label className="block text-green-300 mb-1">Date Range</label>
-                <select className="w-full bg-gray-800 border border-green-500 text-green-400 px-2 py-1 rounded">
-                  <option>Last 30 days</option>
-                  <option>Last 7 days</option>
-                  <option>Last 3 months</option>
-                </select>
+                <label className="block text-green-300 mb-1">Start Date</label>
+                <input 
+                  type="date" 
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="w-full bg-gray-800 border border-green-500 text-green-400 px-2 py-1 rounded"
+                />
+              </div>
+              <div>
+                <label className="block text-green-300 mb-1">End Date</label>
+                <input 
+                  type="date" 
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="w-full bg-gray-800 border border-green-500 text-green-400 px-2 py-1 rounded"
+                />
               </div>
               <div>
                 <label className="block text-green-300 mb-1">Market Cap (Crores)</label>
@@ -210,13 +179,6 @@ const TerminalPage = ({ setCurrentPage, setSelectedCompany }) => {
                   <option>Price</option>
                   <option>1D Change</option>
                   <option>30D Change</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-green-300 mb-1">Order</label>
-                <select className="w-full bg-gray-800 border border-green-500 text-green-400 px-2 py-1 rounded">
-                  <option>Descending</option>
-                  <option>Ascending</option>
                 </select>
               </div>
               <div className="flex items-end">
@@ -274,11 +236,14 @@ const TerminalPage = ({ setCurrentPage, setSelectedCompany }) => {
                 </tr>
               </thead>
               <tbody>
-                {filteredStocks.slice(0, 20).map((stock, index) => (
+                {mockStockData.slice(0, 20).map((stock, index) => (
                   <tr key={index} className="border-t border-gray-800 hover:bg-gray-800">
                     <td 
                       className="p-2 border-r border-gray-800 text-green-400 cursor-pointer hover:text-green-300 hover:underline"
-                      onClick={() => handleCompanyClick(stock.company)}
+                      onClick={() => {
+                        setSelectedCompany(stock.company);
+                        setCurrentPage('search');
+                      }}
                     >
                       {stock.company}
                     </td>
@@ -352,9 +317,23 @@ const TerminalPage = ({ setCurrentPage, setSelectedCompany }) => {
   );
 };
 
-// Company Detail Page Component
-const CompanyDetailPage = ({ companyName, setCurrentPage }) => {
-  const company = mockStockData.find(stock => stock.company === companyName) || mockStockData[0];
+// Search Page Component
+const SearchPage = ({ selectedCompany, setSelectedCompany }) => {
+  const [searchTerm, setSearchTerm] = useState(selectedCompany || '');
+  const [displayedCompany, setDisplayedCompany] = useState(selectedCompany || '');
+
+  const filteredCompanies = mockStockData.filter(stock =>
+    stock.company.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const stockSuggestions = filteredCompanies.slice(0, 5);
+
+  const handleSearch = (companyName) => {
+    setDisplayedCompany(companyName);
+    setSearchTerm(companyName);
+  };
+
+  const company = mockStockData.find(stock => stock.company === displayedCompany) || mockStockData[0];
   
   const companyData = {
     name: company.company,
@@ -378,104 +357,141 @@ const CompanyDetailPage = ({ companyName, setCurrentPage }) => {
       <div className="bg-gray-900 border-b border-green-500 p-4">
         <div className="flex items-center justify-between">
           <div>
-            <button 
-              onClick={() => setCurrentPage('terminal')}
-              className="text-green-500 hover:text-green-300 font-medium text-sm mb-2"
-            >
-              ← Back to Terminal
-            </button>
-            <h1 className="text-xl font-bold text-green-500">{companyData.name}</h1>
+            <h1 className="text-xl font-bold text-green-500">Company Research Terminal</h1>
+            <p className="text-sm text-green-300">Search and analyze individual companies</p>
           </div>
           <div className="text-xs text-green-300">
+            <div>Database: NSE/BSE Listed Companies</div>
             <div>Last updated: 19 Jul 2025</div>
-            <div>Data Quality: High</div>
           </div>
         </div>
       </div>
       
       <div className="max-w-6xl mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="bg-gray-900 border border-green-500 rounded">
-            <div className="bg-gray-800 px-4 py-2 border-b border-green-500">
-              <h3 className="text-green-500 font-bold">COMPANY_INFO.json</h3>
-            </div>
-            <div className="p-4 text-sm space-y-3">
-              <div className="flex justify-between">
-                <span className="text-green-300">"sector":</span>
-                <span className="text-blue-400">"{companyData.sector}"</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-green-300">"market_cap":</span>
-                <span className="text-yellow-400">"{companyData.marketCap}"</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-green-300">"current_price":</span>
-                <span className="text-cyan-400">"{companyData.currentPrice}"</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-green-300">"volume":</span>
-                <span className="text-purple-400">"{parseInt(companyData.volume).toLocaleString()}"</span>
-              </div>
-            </div>
+        {/* Search Bar */}
+        <div className="mb-8 relative">
+          <div className="flex items-center">
+            <span className="text-green-500 mr-2">research@stocktracker:~$</span>
+            <input
+              type="text"
+              placeholder="search --company --name"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="bg-black border border-green-500 text-green-400 px-3 py-2 rounded flex-1 focus:ring-1 focus:ring-green-500 focus:outline-none placeholder-green-600"
+            />
+            <button 
+              onClick={() => handleSearch(searchTerm)}
+              className="ml-2 bg-green-500 text-black px-4 py-2 rounded font-bold hover:bg-green-400"
+            >
+              SEARCH
+            </button>
           </div>
-          
-          <div className="bg-gray-900 border border-green-500 rounded">
-            <div className="bg-gray-800 px-4 py-2 border-b border-green-500">
-              <h3 className="text-green-500 font-bold">PERFORMANCE_METRICS.json</h3>
+          {searchTerm && stockSuggestions.length > 0 && (
+            <div className="absolute top-full left-0 w-full bg-gray-900 border border-green-500 rounded mt-1 z-10 ml-28">
+              {stockSuggestions.map((stock, index) => (
+                <div 
+                  key={index}
+                  className="px-4 py-2 hover:bg-gray-800 cursor-pointer border-b border-gray-800 last:border-b-0"
+                  onClick={() => handleSearch(stock.company)}
+                >
+                  <div className="font-semibold text-green-400">{stock.company}</div>
+                  <div className="text-xs text-blue-400">{stock.sector} • ₹{stock.price}</div>
+                </div>
+              ))}
             </div>
-            <div className="p-4 text-sm space-y-3">
-              <div className="flex justify-between">
-                <span className="text-green-300">"1d_change":</span>
-                <span className={companyData.dayChange.startsWith('+') ? 'text-green-400' : 'text-red-400'}>
-                  "{companyData.dayChange}"
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-green-300">"5d_change":</span>
-                <span className={companyData.weekChange.startsWith('+') ? 'text-green-400' : 'text-red-400'}>
-                  "{companyData.weekChange}"
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-green-300">"30d_change":</span>
-                <span className={companyData.monthChange.startsWith('+') ? 'text-green-400' : 'text-red-400'}>
-                  "{companyData.monthChange}"
-                </span>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
 
-        <div className="mt-8 bg-gray-900 border border-green-500 rounded">
-          <div className="bg-gray-800 px-4 py-2 border-b border-green-500">
-            <h3 className="text-green-500 font-bold">FINANCIAL_RATIOS.json</h3>
-          </div>
-          <div className="p-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-            <div className="bg-gray-800 p-3 rounded border border-gray-700">
-              <div className="text-green-300 text-xs">P/E Ratio</div>
-              <div className="text-xl font-bold text-green-400">{companyData.pe}</div>
+        {displayedCompany && (
+          <>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+              <div className="bg-gray-900 border border-green-500 rounded">
+                <div className="bg-gray-800 px-4 py-2 border-b border-green-500">
+                  <h3 className="text-green-500 font-bold">COMPANY_INFO.json</h3>
+                </div>
+                <div className="p-4 text-sm space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-green-300">"name":</span>
+                    <span className="text-white">"{companyData.name}"</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-green-300">"sector":</span>
+                    <span className="text-blue-400">"{companyData.sector}"</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-green-300">"market_cap":</span>
+                    <span className="text-yellow-400">"{companyData.marketCap}"</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-green-300">"current_price":</span>
+                    <span className="text-cyan-400">"{companyData.currentPrice}"</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-green-300">"volume":</span>
+                    <span className="text-purple-400">"{parseInt(companyData.volume).toLocaleString()}"</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-gray-900 border border-green-500 rounded">
+                <div className="bg-gray-800 px-4 py-2 border-b border-green-500">
+                  <h3 className="text-green-500 font-bold">PERFORMANCE_METRICS.json</h3>
+                </div>
+                <div className="p-4 text-sm space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-green-300">"1d_change":</span>
+                    <span className={companyData.dayChange.startsWith('+') ? 'text-green-400' : 'text-red-400'}>
+                      "{companyData.dayChange}"
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-green-300">"5d_change":</span>
+                    <span className={companyData.weekChange.startsWith('+') ? 'text-green-400' : 'text-red-400'}>
+                      "{companyData.weekChange}"
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-green-300">"30d_change":</span>
+                    <span className={companyData.monthChange.startsWith('+') ? 'text-green-400' : 'text-red-400'}>
+                      "{companyData.monthChange}"
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="bg-gray-800 p-3 rounded border border-gray-700">
-              <div className="text-green-300 text-xs">P/B Ratio</div>
-              <div className="text-xl font-bold text-blue-400">{companyData.pb}</div>
-            </div>
-            <div className="bg-gray-800 p-3 rounded border border-gray-700">
-              <div className="text-green-300 text-xs">ROE</div>
-              <div className="text-xl font-bold text-cyan-400">{companyData.roe}</div>
-            </div>
-            <div className="bg-gray-800 p-3 rounded border border-gray-700">
-              <div className="text-green-300 text-xs">Revenue (TTM)</div>
-              <div className="text-xl font-bold text-yellow-400">{companyData.revenue}</div>
-            </div>
-          </div>
-        </div>
 
-        <div className="mt-6 text-xs">
-          <span className="text-green-300">ANALYSIS_STATUS:</span> 
-          <span className="text-green-400"> Complete</span>
-          <span className="text-green-300 ml-4">LAST_UPDATE:</span>
-          <span className="text-green-400"> 2025-07-19 22:53:25</span>
-        </div>
+            <div className="bg-gray-900 border border-green-500 rounded">
+              <div className="bg-gray-800 px-4 py-2 border-b border-green-500">
+                <h3 className="text-green-500 font-bold">FINANCIAL_RATIOS.json</h3>
+              </div>
+              <div className="p-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div className="bg-gray-800 p-3 rounded border border-gray-700">
+                  <div className="text-green-300 text-xs">P/E Ratio</div>
+                  <div className="text-xl font-bold text-green-400">{companyData.pe}</div>
+                </div>
+                <div className="bg-gray-800 p-3 rounded border border-gray-700">
+                  <div className="text-green-300 text-xs">P/B Ratio</div>
+                  <div className="text-xl font-bold text-blue-400">{companyData.pb}</div>
+                </div>
+                <div className="bg-gray-800 p-3 rounded border border-gray-700">
+                  <div className="text-green-300 text-xs">ROE</div>
+                  <div className="text-xl font-bold text-cyan-400">{companyData.roe}</div>
+                </div>
+                <div className="bg-gray-800 p-3 rounded border border-gray-700">
+                  <div className="text-green-300 text-xs">Revenue (TTM)</div>
+                  <div className="text-xl font-bold text-yellow-400">{companyData.revenue}</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 text-xs">
+              <span className="text-green-300">ANALYSIS_STATUS:</span> 
+              <span className="text-green-400"> Complete</span>
+              <span className="text-green-300 ml-4">LAST_UPDATE:</span>
+              <span className="text-green-400"> 2025-07-19 22:53:25</span>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
@@ -487,10 +503,7 @@ const HomePage = ({ setCurrentPage }) => {
     <div>
       <HeroSection />
       <ScrollingNews />
-      <EngagementSection />
-      <ConvinceSection />
-      <HowItWorksSection />
-      <PreviewSection setCurrentPage={setCurrentPage} />
+      <FeatureSection />
       <CTASection />
     </div>
   );
@@ -504,9 +517,9 @@ function App() {
   const renderPage = () => {
     switch (currentPage) {
       case 'terminal':
-        return <TerminalPage setCurrentPage={setCurrentPage} setSelectedCompany={setSelectedCompany} />;
-      case 'company':
-        return <CompanyDetailPage companyName={selectedCompany} setCurrentPage={setCurrentPage} />;
+        return <UpdatesPage setCurrentPage={setCurrentPage} setSelectedCompany={setSelectedCompany} />;
+      case 'search':
+        return <SearchPage selectedCompany={selectedCompany} setSelectedCompany={setSelectedCompany} />;
       case 'home':
       default:
         return <HomePage setCurrentPage={setCurrentPage} />;
