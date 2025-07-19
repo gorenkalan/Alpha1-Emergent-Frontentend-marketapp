@@ -287,44 +287,173 @@ export const ScrollingNews = () => {
 };
 
 export const FeatureSection = () => {
+  const [activeFeature, setActiveFeature] = useState(0);
   const features = [
     {
-      title: "No Predictions. Just Facts.",
+      title: "NO_PREDICTIONS",
+      subtitle: "Just Facts",
+      code: "if (prediction == true) { return false; }",
       description: "We don't tell you what will happen. We show you what already happened and let you decide.",
-      icon: "📊"
+      color: "from-red-500 to-orange-500"
     },
     {
-      title: "93% Lose in F&O",
+      title: "F&O_WARNING", 
+      subtitle: "93% Lose Money",
+      code: "futures_trading.success_rate = 7%;",
       description: "We won't encourage trading or futures. We focus on long-term wealth building through smart analysis.",
-      icon: "⚠️"
+      color: "from-yellow-500 to-red-500"
     },
     {
-      title: "India is Early",
+      title: "INDIA_EARLY",
+      subtitle: "Growth Opportunity", 
+      code: "india.growth_potential = MASSIVE;",
       description: "While others chase developed markets, we help you capitalize on India's growth story.",
-      icon: "🇮🇳"
+      color: "from-green-500 to-emerald-500"
     }
   ];
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveFeature((prev) => (prev + 1) % features.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <section className="py-20 bg-gray-50">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-6">
-            Why We're Different
-          </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Most platforms sell you dreams. We sell you reality.
-          </p>
+    <section className="py-20 bg-black text-white relative overflow-hidden">
+      {/* Animated Grid Background */}
+      <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-900 opacity-90"></div>
+        <div className="grid grid-cols-10 grid-rows-6 h-full w-full opacity-10">
+          {Array.from({ length: 60 }).map((_, i) => (
+            <div key={i} className={`border-r border-b border-green-500 ${i % 9 === 0 ? 'bg-green-500/5' : ''}`}></div>
+          ))}
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      </div>
+
+      {/* Floating Code Snippets */}
+      <div className="absolute inset-0">
+        {Array.from({ length: 15 }).map((_, i) => (
+          <div
+            key={i}
+            className="absolute text-green-500 font-mono text-xs opacity-20 animate-pulse"
+            style={{
+              left: `${Math.random() * 90 + 5}%`,
+              top: `${Math.random() * 80 + 10}%`,
+              animationDelay: `${Math.random() * 3}s`,
+              animationDuration: `${3 + Math.random() * 2}s`
+            }}
+          >
+            {['if()', '{}', '[]', '&&', '||', '!=', '==', '=>'][Math.floor(Math.random() * 8)]}
+          </div>
+        ))}
+      </div>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <div className="inline-block mb-8">
+            <div className="bg-gradient-to-r from-green-400 to-blue-500 text-transparent bg-clip-text">
+              <h2 className="text-5xl md:text-7xl font-black leading-none tracking-tighter mb-4">
+                WHY WE'RE
+              </h2>
+              <h2 className="text-5xl md:text-7xl font-black leading-none tracking-tighter">
+                DIFFERENT
+              </h2>
+            </div>
+          </div>
+          
+          <div className="max-w-3xl mx-auto mb-12">
+            <p className="text-xl md:text-2xl text-gray-300 leading-relaxed">
+              Most platforms sell you{' '}
+              <span className="text-red-400 font-bold">dreams</span>. We sell you{' '}
+              <span className="text-green-400 font-bold">reality</span>.
+            </p>
+          </div>
+        </div>
+
+        {/* Terminal-Style Feature Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
           {features.map((feature, index) => (
-            <div key={index} className="bg-white p-8 rounded-xl shadow-lg border-l-4 border-blue-500 hover:shadow-xl transition-shadow">
-              <div className="text-4xl mb-4">{feature.icon}</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">{feature.title}</h3>
-              <p className="text-gray-600 leading-relaxed">{feature.description}</p>
+            <div
+              key={index}
+              className={`relative p-8 rounded-2xl border-2 transition-all duration-700 bg-gray-900/50 ${
+                activeFeature === index 
+                  ? 'border-green-500 scale-105 shadow-2xl shadow-green-500/20' 
+                  : 'border-gray-700 hover:border-green-500/50'
+              }`}
+            >
+              <div className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-${activeFeature === index ? '15' : '5'} rounded-2xl`}></div>
+              <div className="relative z-10">
+                {/* Terminal Header */}
+                <div className="flex items-center justify-between mb-4 pb-2 border-b border-gray-700">
+                  <div className="flex space-x-2">
+                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  </div>
+                  <span className="text-green-400 text-xs font-mono">terminal.js</span>
+                </div>
+                
+                {/* Code Block */}
+                <div className="bg-black/50 p-4 rounded-lg border border-gray-700 mb-4">
+                  <div className="text-green-400 font-mono text-sm mb-2">
+                    <span className="text-blue-400">const</span> {feature.title.toLowerCase()} = {'{'}
+                  </div>
+                  <div className="text-cyan-400 font-mono text-xs ml-4 mb-2">
+                    {feature.code}
+                  </div>
+                  <div className="text-green-400 font-mono text-sm">
+                    {'};'}
+                  </div>
+                </div>
+                
+                {/* Feature Content */}
+                <div className="text-2xl md:text-3xl font-bold text-white mb-2">
+                  {feature.title.replace('_', ' ')}
+                </div>
+                <div className="text-lg text-gray-400 mb-4">
+                  {feature.subtitle}
+                </div>
+                <div className="text-gray-300 leading-relaxed">
+                  {feature.description}
+                </div>
+              </div>
             </div>
           ))}
+        </div>
+
+        {/* Bottom Terminal Output */}
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-gray-900 rounded-lg border border-green-500 overflow-hidden">
+            <div className="bg-gray-800 px-4 py-2 flex items-center justify-between border-b border-green-500">
+              <div className="flex space-x-2">
+                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+              </div>
+              <span className="text-green-400 text-sm font-mono">StockTracker Philosophy</span>
+            </div>
+            <div className="p-6 font-mono text-sm">
+              <div className="text-green-400">
+                <span className="text-green-500">philosophy@stocktracker:~$</span> initialize --core-values
+              </div>
+              <div className="text-green-300 mt-2">
+                Loading investment philosophy...
+              </div>
+              <div className="text-blue-400 mt-1">
+                ✓ Skepticism: enabled
+              </div>
+              <div className="text-yellow-400 mt-1">
+                ✓ Data-driven analysis: active
+              </div>
+              <div className="text-green-400 mt-1">
+                ✓ No hype, no false promises: verified
+              </div>
+              <div className="text-cyan-400 mt-2">
+                Ready to help you make informed decisions.
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
