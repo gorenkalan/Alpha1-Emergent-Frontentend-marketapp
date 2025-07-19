@@ -1,33 +1,49 @@
 import React, { useState, useEffect } from 'react';
 
-// Mock stock data
+// Mock stock data - expanded
 const mockStockData = [
-  { company: "Reliance Industries", marketCap: "1845673", sector: "Oil & Gas", price: "2456.75", dataQuality: "High", change1d: "+2.45", change5d: "+8.12", change10d: "-1.23", change15d: "+15.67", change20d: "+12.34", change30d: "+25.78" },
-  { company: "Tata Consultancy Services", marketCap: "1234567", sector: "IT Services", price: "3345.20", dataQuality: "High", change1d: "+1.80", change5d: "+5.45", change10d: "+12.67", change15d: "+18.90", change20d: "+22.11", change30d: "+28.45" },
-  { company: "HDFC Bank", marketCap: "987654", sector: "Banking", price: "1567.85", dataQuality: "Medium", change1d: "-0.75", change5d: "+3.22", change10d: "+7.89", change15d: "+11.45", change20d: "+16.78", change30d: "+21.23" },
-  { company: "Infosys", marketCap: "876543", sector: "IT Services", price: "1789.30", dataQuality: "High", change1d: "+3.12", change5d: "+9.87", change10d: "+14.56", change15d: "+19.23", change20d: "+24.67", change30d: "+31.45" },
-  { company: "ICICI Bank", marketCap: "765432", sector: "Banking", price: "1123.45", dataQuality: "High", change1d: "+1.45", change5d: "+6.78", change10d: "+11.23", change15d: "+16.89", change20d: "+21.45", change30d: "+27.67" },
-  { company: "Bharti Airtel", marketCap: "654321", sector: "Telecom", price: "894.60", dataQuality: "Medium", change1d: "-2.30", change5d: "+4.56", change10d: "+9.12", change15d: "+13.78", change20d: "+18.34", change30d: "+23.89" },
-  { company: "ITC", marketCap: "543210", sector: "FMCG", price: "456.78", dataQuality: "High", change1d: "+0.95", change5d: "+3.45", change10d: "+7.23", change15d: "+12.67", change20d: "+17.89", change30d: "+22.34" },
-  { company: "State Bank of India", marketCap: "432109", sector: "Banking", price: "723.45", dataQuality: "Medium", change1d: "+2.67", change5d: "+8.90", change10d: "+13.45", change15d: "+18.23", change20d: "+23.78", change30d: "+29.12" },
-  { company: "Larsen & Toubro", marketCap: "321098", sector: "Construction", price: "3456.78", dataQuality: "High", change1d: "+1.23", change5d: "+5.67", change10d: "+10.34", change15d: "+15.89", change20d: "+20.45", change30d: "+26.78" },
-  { company: "Asian Paints", marketCap: "298765", sector: "Chemicals", price: "2987.65", dataQuality: "High", change1d: "-1.45", change5d: "+2.78", change10d: "+6.45", change15d: "+11.23", change20d: "+15.67", change30d: "+20.89" },
+  { company: "Reliance Industries", marketCap: "1845673", sector: "Oil & Gas", price: "2456.75", dataQuality: "High", change1d: "+2.45", change5d: "+8.12", change10d: "-1.23", change15d: "+15.67", change20d: "+12.34", change30d: "+25.78", volume: "12456789" },
+  { company: "Tata Consultancy Services", marketCap: "1234567", sector: "IT Services", price: "3345.20", dataQuality: "High", change1d: "+1.80", change5d: "+5.45", change10d: "+12.67", change15d: "+18.90", change20d: "+22.11", change30d: "+28.45", volume: "8765432" },
+  { company: "HDFC Bank", marketCap: "987654", sector: "Banking", price: "1567.85", dataQuality: "Medium", change1d: "-0.75", change5d: "+3.22", change10d: "+7.89", change15d: "+11.45", change20d: "+16.78", change30d: "+21.23", volume: "15678901" },
+  { company: "Infosys", marketCap: "876543", sector: "IT Services", price: "1789.30", dataQuality: "High", change1d: "+3.12", change5d: "+9.87", change10d: "+14.56", change15d: "+19.23", change20d: "+24.67", change30d: "+31.45", volume: "6789123" },
+  { company: "ICICI Bank", marketCap: "765432", sector: "Banking", price: "1123.45", dataQuality: "High", change1d: "+1.45", change5d: "+6.78", change10d: "+11.23", change15d: "+16.89", change20d: "+21.45", change30d: "+27.67", volume: "9876543" },
+  { company: "Bharti Airtel", marketCap: "654321", sector: "Telecom", price: "894.60", dataQuality: "Medium", change1d: "-2.30", change5d: "+4.56", change10d: "+9.12", change15d: "+13.78", change20d: "+18.34", change30d: "+23.89", volume: "11234567" },
+  { company: "ITC", marketCap: "543210", sector: "FMCG", price: "456.78", dataQuality: "High", change1d: "+0.95", change5d: "+3.45", change10d: "+7.23", change15d: "+12.67", change20d: "+17.89", change30d: "+22.34", volume: "7890123" },
+  { company: "State Bank of India", marketCap: "432109", sector: "Banking", price: "723.45", dataQuality: "Medium", change1d: "+2.67", change5d: "+8.90", change10d: "+13.45", change15d: "+18.23", change20d: "+23.78", change30d: "+29.12", volume: "13456789" },
+  { company: "Larsen & Toubro", marketCap: "321098", sector: "Construction", price: "3456.78", dataQuality: "High", change1d: "+1.23", change5d: "+5.67", change10d: "+10.34", change15d: "+15.89", change20d: "+20.45", change30d: "+26.78", volume: "5678912" },
+  { company: "Asian Paints", marketCap: "298765", sector: "Chemicals", price: "2987.65", dataQuality: "High", change1d: "-1.45", change5d: "+2.78", change10d: "+6.45", change15d: "+11.23", change20d: "+15.67", change30d: "+20.89", volume: "4567891" },
+  { company: "Adani Enterprises", marketCap: "543219", sector: "Conglomerate", price: "2345.67", dataQuality: "Medium", change1d: "+12.45", change5d: "+18.90", change10d: "+25.67", change15d: "+32.45", change20d: "+28.90", change30d: "+35.78", volume: "18765432" },
+  { company: "Zomato", marketCap: "123456", sector: "Food Delivery", price: "189.45", dataQuality: "High", change1d: "+8.90", change5d: "+15.67", change10d: "+22.34", change15d: "+28.90", change20d: "+24.56", change30d: "+31.23", volume: "25678901" },
+  { company: "Paytm", marketCap: "234567", sector: "Fintech", price: "567.89", dataQuality: "Medium", change1d: "+7.34", change5d: "+12.78", change10d: "+19.45", change15d: "+25.67", change20d: "+21.89", change30d: "+28.45", volume: "19876543" },
+  { company: "Nykaa", marketCap: "156789", sector: "E-commerce", price: "234.56", dataQuality: "High", change1d: "+6.78", change5d: "+11.45", change10d: "+17.89", change15d: "+23.45", change20d: "+19.78", change30d: "+26.34", volume: "8765432" },
+  { company: "PolicyBazaar", marketCap: "187654", sector: "Insurance", price: "456.78", dataQuality: "Medium", change1d: "+5.67", change5d: "+9.89", change10d: "+15.67", change15d: "+21.34", change20d: "+17.89", change30d: "+24.56", volume: "6789123" },
+  { company: "Vedanta", marketCap: "345678", sector: "Mining", price: "234.56", dataQuality: "High", change1d: "-8.90", change5d: "-12.34", change10d: "-18.67", change15d: "-24.45", change20d: "-20.78", change30d: "-27.89", volume: "22345678" },
+  { company: "Tata Steel", marketCap: "298765", sector: "Steel", price: "123.45", dataQuality: "Medium", change1d: "-7.34", change5d: "-11.67", change10d: "-17.23", change15d: "-22.89", change20d: "-19.45", change30d: "-25.67", volume: "16789123" },
+  { company: "JSW Steel", marketCap: "267891", sector: "Steel", price: "678.90", dataQuality: "High", change1d: "-6.78", change5d: "-10.45", change10d: "-15.89", change15d: "-21.23", change20d: "-17.67", change30d: "-23.45", volume: "14567890" },
+  { company: "Coal India", marketCap: "234567", sector: "Mining", price: "345.67", dataQuality: "Medium", change1d: "-5.67", change5d: "-9.23", change10d: "-14.56", change15d: "-19.78", change20d: "-16.34", change30d: "-21.89", volume: "12345678" },
+  { company: "ONGC", marketCap: "198765", sector: "Oil & Gas", price: "178.90", dataQuality: "High", change1d: "-4.89", change5d: "-8.12", change10d: "-13.45", change15d: "-18.67", change20d: "-15.23", change30d: "-20.56", volume: "10987654" },
 ];
 
 const mockTopGainers = [
-  { company: "Adani Enterprises", price: "2345.67", change: "+12.45%", sector: "Conglomerate" },
-  { company: "Zomato", price: "189.45", change: "+8.90%", sector: "Food Delivery" },
-  { company: "Paytm", price: "567.89", change: "+7.34%", sector: "Fintech" },
-  { company: "Nykaa", price: "234.56", change: "+6.78%", sector: "E-commerce" },
-  { company: "PolicyBazaar", price: "456.78", change: "+5.67%", sector: "Insurance" },
+  { company: "Adani Enterprises", marketCap: "543219", sector: "Conglomerate", price: "2345.67", change: "+12.45", volume: "18765432" },
+  { company: "Zomato", marketCap: "123456", sector: "Food Delivery", price: "189.45", change: "+8.90", volume: "25678901" },
+  { company: "Paytm", marketCap: "234567", sector: "Fintech", price: "567.89", change: "+7.34", volume: "19876543" },
+  { company: "Nykaa", marketCap: "156789", sector: "E-commerce", price: "234.56", change: "+6.78", volume: "8765432" },
+  { company: "PolicyBazaar", marketCap: "187654", sector: "Insurance", price: "456.78", change: "+5.67", volume: "6789123" },
+  { company: "Infosys", marketCap: "876543", sector: "IT Services", price: "1789.30", change: "+3.12", volume: "6789123" },
+  { company: "State Bank of India", marketCap: "432109", sector: "Banking", price: "723.45", change: "+2.67", volume: "13456789" },
+  { company: "Reliance Industries", marketCap: "1845673", sector: "Oil & Gas", price: "2456.75", change: "+2.45", volume: "12456789" },
 ];
 
 const mockTopLosers = [
-  { company: "Vedanta", price: "234.56", change: "-8.90%", sector: "Mining" },
-  { company: "Tata Steel", price: "123.45", change: "-7.34%", sector: "Steel" },
-  { company: "JSW Steel", price: "678.90", change: "-6.78%", sector: "Steel" },
-  { company: "Coal India", price: "345.67", change: "-5.67%", sector: "Mining" },
-  { company: "ONGC", price: "178.90", change: "-4.89%", sector: "Oil & Gas" },
+  { company: "Vedanta", marketCap: "345678", sector: "Mining", price: "234.56", change: "-8.90", volume: "22345678" },
+  { company: "Tata Steel", marketCap: "298765", sector: "Steel", price: "123.45", change: "-7.34", volume: "16789123" },
+  { company: "JSW Steel", marketCap: "267891", sector: "Steel", price: "678.90", change: "-6.78", volume: "14567890" },
+  { company: "Coal India", marketCap: "234567", sector: "Mining", price: "345.67", change: "-5.67", volume: "12345678" },
+  { company: "ONGC", marketCap: "198765", sector: "Oil & Gas", price: "178.90", change: "-4.89", volume: "10987654" },
+  { company: "Bharti Airtel", marketCap: "654321", sector: "Telecom", price: "894.60", change: "-2.30", volume: "11234567" },
+  { company: "Asian Paints", marketCap: "298765", sector: "Chemicals", price: "2987.65", change: "-1.45", volume: "4567891" },
+  { company: "HDFC Bank", marketCap: "987654", sector: "Banking", price: "1567.85", change: "-0.75", volume: "15678901" },
 ];
 
 const mockNews = [
@@ -38,44 +54,52 @@ const mockNews = [
   "Monsoon forecast positive - Agriculture sector to benefit"
 ];
 
+const sectors = ["All Sectors", "Banking", "IT Services", "Oil & Gas", "FMCG", "Telecom", "Construction", "Chemicals", "Mining", "Steel", "Conglomerate", "Food Delivery", "Fintech", "E-commerce", "Insurance"];
+
 // Components
 export const Header = ({ currentPage, setCurrentPage }) => {
   return (
-    <header className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 shadow-2xl sticky top-0 z-50">
+    <header className="bg-gray-900 shadow-2xl sticky top-0 z-50 border-b border-green-500">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center py-4">
+        <div className="flex justify-between items-center py-3">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-r from-blue-400 to-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">₹</span>
+            <div className="w-10 h-10 bg-green-500 rounded flex items-center justify-center">
+              <span className="text-black font-bold text-xl">S</span>
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white">StockWise</h1>
-              <p className="text-blue-200 text-sm">Smart Investment Insights</p>
+              <h1 className="text-xl font-bold text-green-500">StockTracker</h1>
+              <p className="text-green-300 text-xs">Terminal v2.1.0</p>
             </div>
           </div>
-          <nav className="flex space-x-6">
+          <nav className="flex space-x-4">
             <button 
               onClick={() => setCurrentPage('home')}
-              className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+              className={`px-3 py-1 rounded text-sm font-medium transition-all duration-300 ${
                 currentPage === 'home' 
-                ? 'bg-blue-600 text-white shadow-lg' 
-                : 'text-blue-200 hover:text-white hover:bg-blue-700'
+                ? 'bg-green-500 text-black' 
+                : 'text-green-400 hover:text-green-300 hover:bg-gray-800'
               }`}
             >
               Home
             </button>
             <button 
               onClick={() => setCurrentPage('terminal')}
-              className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+              className={`px-3 py-1 rounded text-sm font-medium transition-all duration-300 ${
                 currentPage === 'terminal' 
-                ? 'bg-blue-600 text-white shadow-lg' 
-                : 'text-blue-200 hover:text-white hover:bg-blue-700'
+                ? 'bg-green-500 text-black' 
+                : 'text-green-400 hover:text-green-300 hover:bg-gray-800'
               }`}
             >
-              Terminal
+              Updates
             </button>
-            <button className="bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:from-green-600 hover:to-green-700 transition-all duration-300 shadow-lg transform hover:scale-105">
-              Subscribe Now
+            <button 
+              onClick={() => setCurrentPage('terminal')}
+              className="text-green-400 hover:text-green-300 px-3 py-1 text-sm"
+            >
+              Login
+            </button>
+            <button className="bg-green-500 text-black px-4 py-1 rounded text-sm font-semibold hover:bg-green-400 transition-all duration-300">
+              Get Started
             </button>
           </nav>
         </div>
@@ -87,7 +111,6 @@ export const Header = ({ currentPage, setCurrentPage }) => {
 export const HeroSection = () => {
   return (
     <section className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 overflow-hidden">
-      {/* Background Image Overlay */}
       <div className="absolute inset-0 opacity-20">
         <img 
           src="https://images.unsplash.com/photo-1639768939489-025b90ba9f23?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDJ8MHwxfHNlYXJjaHwyfHxmaW5hbmNpYWwlMjBjaGFydHN8ZW58MHx8fGJsdWV8MTc1Mjk1Njc4OXww&ixlib=rb-4.1.0&q=85" 
@@ -101,7 +124,7 @@ export const HeroSection = () => {
           <div className="text-white space-y-8">
             <div className="space-y-6">
               <h1 className="text-5xl lg:text-7xl font-bold leading-tight bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
-                Not Investing Because You Don't Know Where to Start?
+                Stop Guessing. Start Analyzing.
               </h1>
               <div className="space-y-4 text-lg lg:text-xl leading-relaxed">
                 <p className="flex items-center space-x-3">
@@ -160,8 +183,7 @@ export const EngagementSection = () => {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-8">
-            <span className="text-4xl mr-4">🤯</span>
-            Not Investing Because You Don't Know Where to Start?
+            The Problem with Stock Market Advice
           </h2>
           <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
             You're not alone. Most people don't invest—not because they don't want to grow their wealth,
@@ -238,16 +260,16 @@ export const ScrollingNews = () => {
   }, []);
   
   return (
-    <div className="bg-blue-900 text-white py-3 overflow-hidden">
+    <div className="bg-gray-900 text-green-400 py-2 overflow-hidden border-t border-b border-green-500 font-mono text-sm">
       <div className="flex items-center space-x-8">
-        <span className="font-semibold text-yellow-400 px-4">BREAKING:</span>
-        <div className="flex-1 relative h-6">
+        <span className="font-semibold text-green-500 px-4">BREAKING:</span>
+        <div className="flex-1 relative h-5">
           <div 
             className="absolute inset-0 transition-transform duration-500 ease-in-out flex items-center"
             style={{ transform: `translateX(-${currentIndex * 100}%)` }}
           >
             {mockNews.map((news, index) => (
-              <div key={index} className="w-full flex-shrink-0 cursor-pointer hover:text-yellow-200">
+              <div key={index} className="w-full flex-shrink-0 cursor-pointer hover:text-green-300">
                 {news}
               </div>
             ))}
@@ -264,7 +286,6 @@ export const ConvinceSection = () => {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl lg:text-5xl font-bold mb-8">
-            <span className="text-4xl mr-4">🙌</span>
             Our Only Promise: We Don't Make Promises
           </h2>
         </div>
@@ -310,8 +331,7 @@ export const HowItWorksSection = () => {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-8">
-            <span className="text-4xl mr-4">⚙️</span>
-            How It Works
+            How Our Analysis Works
           </h2>
           <p className="text-xl text-gray-600 max-w-4xl mx-auto">
             We help you understand how the market actually reacted—not how people say it will.
@@ -373,7 +393,7 @@ export const PreviewSection = ({ setCurrentPage }) => {
           <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-6">
             <div className="flex items-center justify-between">
               <h3 className="text-2xl font-bold">Analysis Results Preview</h3>
-              <span className="bg-blue-500 px-3 py-1 rounded-full text-sm">Free Tier: 10 stocks max</span>
+              <span className="bg-blue-500 px-3 py-1 rounded-full text-sm">Live Data Available</span>
             </div>
           </div>
           
@@ -385,7 +405,7 @@ export const PreviewSection = ({ setCurrentPage }) => {
                   {mockTopGainers.slice(0, 3).map((stock, index) => (
                     <div key={index} className="flex justify-between">
                       <span className="text-sm text-gray-700">{stock.company}</span>
-                      <span className="text-sm font-semibold text-green-600">{stock.change}</span>
+                      <span className="text-sm font-semibold text-green-600">{stock.change}%</span>
                     </div>
                   ))}
                 </div>
@@ -397,7 +417,7 @@ export const PreviewSection = ({ setCurrentPage }) => {
                   {mockTopLosers.slice(0, 3).map((stock, index) => (
                     <div key={index} className="flex justify-between">
                       <span className="text-sm text-gray-700">{stock.company}</span>
-                      <span className="text-sm font-semibold text-red-600">{stock.change}</span>
+                      <span className="text-sm font-semibold text-red-600">{stock.change}%</span>
                     </div>
                   ))}
                 </div>
@@ -460,20 +480,15 @@ export const PreviewSection = ({ setCurrentPage }) => {
             </div>
             
             <div className="mt-6 text-center">
-              <div className="inline-flex items-center bg-yellow-50 border border-yellow-300 rounded-lg p-4 mb-4">
-                <span className="text-yellow-800">
-                  🔒 Want to see more stocks and advanced filters? Subscribe to unlock full access!
-                </span>
-              </div>
               <div className="space-x-4">
                 <button 
                   onClick={() => setCurrentPage('terminal')}
                   className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
                 >
-                  View Full Terminal
+                  View Full Analysis
                 </button>
                 <button className="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors">
-                  Subscribe Now
+                  Get Started
                 </button>
               </div>
             </div>
@@ -497,30 +512,30 @@ export const CTASection = () => {
       
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 className="text-4xl lg:text-6xl font-bold mb-8">
-          Ready to Start Your Investment Journey?
+          Ready to Make Informed Investment Decisions?
         </h2>
         <p className="text-xl lg:text-2xl text-blue-200 mb-12 leading-relaxed">
           Join thousands of smart investors who trust our data-driven approach to market analysis.
-          Start free, upgrade when you're ready.
+          Start your journey with comprehensive stock insights today.
         </p>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           <div className="bg-white/10 backdrop-blur-lg p-6 rounded-xl border border-blue-400/20">
-            <h3 className="text-xl font-bold mb-2">Free Tier</h3>
-            <p className="text-blue-200">10 stocks, basic filters, daily updates</p>
+            <h3 className="text-xl font-bold mb-2">Live Data</h3>
+            <p className="text-blue-200">Real-time stock prices and market movements</p>
           </div>
           <div className="bg-white/10 backdrop-blur-lg p-6 rounded-xl border border-blue-400/20">
-            <h3 className="text-xl font-bold mb-2">Pro Tier</h3>
-            <p className="text-blue-200">Unlimited stocks, advanced filters, real-time data</p>
+            <h3 className="text-xl font-bold mb-2">Advanced Analytics</h3>
+            <p className="text-blue-200">Comprehensive filtering and analysis tools</p>
           </div>
           <div className="bg-white/10 backdrop-blur-lg p-6 rounded-xl border border-blue-400/20">
-            <h3 className="text-xl font-bold mb-2">Expert Insights</h3>
-            <p className="text-blue-200">Detailed analysis, sector reports, alerts</p>
+            <h3 className="text-xl font-bold mb-2">Market Insights</h3>
+            <p className="text-blue-200">Daily market reports and sector analysis</p>
           </div>
         </div>
         
         <button className="bg-gradient-to-r from-green-500 to-green-600 text-white px-12 py-4 rounded-xl font-bold text-xl hover:from-green-600 hover:to-green-700 transition-all duration-300 shadow-2xl transform hover:scale-105">
-          Get Started Free
+          Start Analyzing Now
         </button>
       </div>
     </section>
@@ -534,10 +549,10 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center space-x-3 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-400 to-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold">₹</span>
+              <div className="w-8 h-8 bg-green-500 rounded flex items-center justify-center">
+                <span className="text-black font-bold">S</span>
               </div>
-              <span className="text-xl font-bold">StockWise</span>
+              <span className="text-xl font-bold">StockTracker</span>
             </div>
             <p className="text-gray-400">Smart investment insights for the modern investor.</p>
           </div>
@@ -571,9 +586,193 @@ export const Footer = () => {
         </div>
         
         <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-          <p>&copy; 2025 StockWise. All rights reserved. Investment insights for informed decisions.</p>
+          <p>&copy; 2025 StockTracker. All rights reserved. Investment insights for informed decisions.</p>
         </div>
       </div>
     </footer>
+  );
+};
+
+// Top Gainers/Losers Table Component
+export const MarketMoversTable = ({ data, title, type, setSelectedCompany, setCurrentPage }) => {
+  const [displayCount, setDisplayCount] = useState(10);
+  const [currentPage, setPage] = useState(1);
+  const [sortBy, setSortBy] = useState('change');
+  const [sortOrder, setSortOrder] = useState('desc');
+  const [sectorFilter, setSectorFilter] = useState('All Sectors');
+  const [minMarketCap, setMinMarketCap] = useState('');
+  const [maxMarketCap, setMaxMarketCap] = useState('');
+  
+  const filteredData = data
+    .filter(stock => {
+      if (sectorFilter !== 'All Sectors' && stock.sector !== sectorFilter) return false;
+      if (minMarketCap && parseInt(stock.marketCap) < parseInt(minMarketCap)) return false;
+      if (maxMarketCap && parseInt(stock.marketCap) > parseInt(maxMarketCap)) return false;
+      return true;
+    })
+    .sort((a, b) => {
+      let aVal, bVal;
+      switch (sortBy) {
+        case 'change':
+          aVal = parseFloat(a.change.replace('%', ''));
+          bVal = parseFloat(b.change.replace('%', ''));
+          break;
+        case 'company':
+          return sortOrder === 'asc' ? a.company.localeCompare(b.company) : b.company.localeCompare(a.company);
+        case 'marketCap':
+          aVal = parseInt(a.marketCap);
+          bVal = parseInt(b.marketCap);
+          break;
+        case 'price':
+          aVal = parseFloat(a.price);
+          bVal = parseFloat(b.price);
+          break;
+        case 'volume':
+          aVal = parseInt(a.volume);
+          bVal = parseInt(b.volume);
+          break;
+        default:
+          aVal = parseFloat(a.change.replace('%', ''));
+          bVal = parseFloat(b.change.replace('%', ''));
+      }
+      return sortOrder === 'asc' ? aVal - bVal : bVal - aVal;
+    });
+  
+  const totalPages = Math.ceil(filteredData.length / displayCount);
+  const paginatedData = filteredData.slice((currentPage - 1) * displayCount, currentPage * displayCount);
+  
+  const handleCompanyClick = (companyName) => {
+    setSelectedCompany(companyName);
+    setCurrentPage('company');
+  };
+  
+  return (
+    <div className="bg-gray-900 text-green-400 rounded border border-green-500 font-mono">
+      <div className="bg-gray-800 px-4 py-3 border-b border-green-500 flex justify-between items-center">
+        <h3 className="text-green-500 font-bold">{title}</h3>
+        <span className="text-xs text-green-300">{filteredData.length} stocks</span>
+      </div>
+      
+      {/* Filters */}
+      <div className="p-4 border-b border-gray-700 grid grid-cols-2 md:grid-cols-6 gap-3 text-xs">
+        <select 
+          value={sectorFilter} 
+          onChange={(e) => setSectorFilter(e.target.value)}
+          className="bg-gray-800 border border-green-500 text-green-400 px-2 py-1 rounded"
+        >
+          {sectors.map(sector => (
+            <option key={sector} value={sector}>{sector}</option>
+          ))}
+        </select>
+        
+        <input
+          placeholder="Min Market Cap"
+          value={minMarketCap}
+          onChange={(e) => setMinMarketCap(e.target.value)}
+          className="bg-gray-800 border border-green-500 text-green-400 px-2 py-1 rounded placeholder-green-600"
+        />
+        
+        <input
+          placeholder="Max Market Cap"
+          value={maxMarketCap}
+          onChange={(e) => setMaxMarketCap(e.target.value)}
+          className="bg-gray-800 border border-green-500 text-green-400 px-2 py-1 rounded placeholder-green-600"
+        />
+        
+        <select 
+          value={sortBy} 
+          onChange={(e) => setSortBy(e.target.value)}
+          className="bg-gray-800 border border-green-500 text-green-400 px-2 py-1 rounded"
+        >
+          <option value="change">Change %</option>
+          <option value="company">Company</option>
+          <option value="marketCap">Market Cap</option>
+          <option value="price">Price</option>
+          <option value="volume">Volume</option>
+        </select>
+        
+        <select 
+          value={sortOrder} 
+          onChange={(e) => setSortOrder(e.target.value)}
+          className="bg-gray-800 border border-green-500 text-green-400 px-2 py-1 rounded"
+        >
+          <option value="desc">Descending</option>
+          <option value="asc">Ascending</option>
+        </select>
+        
+        <select 
+          value={displayCount} 
+          onChange={(e) => setDisplayCount(parseInt(e.target.value))}
+          className="bg-gray-800 border border-green-500 text-green-400 px-2 py-1 rounded"
+        >
+          <option value={10}>10 stocks</option>
+          <option value={25}>25 stocks</option>
+          <option value={50}>50 stocks</option>
+          <option value={100}>100 stocks</option>
+        </select>
+      </div>
+      
+      {/* Table */}
+      <div className="overflow-x-auto">
+        <table className="w-full text-xs">
+          <thead className="bg-gray-800 text-green-500">
+            <tr>
+              <th className="text-left p-2 border-r border-gray-700">Company</th>
+              <th className="text-left p-2 border-r border-gray-700">Market Cap (Cr)</th>
+              <th className="text-left p-2 border-r border-gray-700">Sector</th>
+              <th className="text-left p-2 border-r border-gray-700">Price</th>
+              <th className="text-left p-2 border-r border-gray-700">Change %</th>
+              <th className="text-left p-2">Volume</th>
+            </tr>
+          </thead>
+          <tbody>
+            {paginatedData.map((stock, index) => (
+              <tr key={index} className="border-t border-gray-800 hover:bg-gray-800">
+                <td 
+                  className="p-2 border-r border-gray-800 text-green-400 cursor-pointer hover:text-green-300 hover:underline"
+                  onClick={() => handleCompanyClick(stock.company)}
+                >
+                  {stock.company}
+                </td>
+                <td className="p-2 border-r border-gray-800">₹{stock.marketCap}</td>
+                <td className="p-2 border-r border-gray-800 text-blue-400">{stock.sector}</td>
+                <td className="p-2 border-r border-gray-800">₹{stock.price}</td>
+                <td className={`p-2 border-r border-gray-800 ${
+                  stock.change.startsWith('+') ? 'text-green-400' : 'text-red-400'
+                }`}>
+                  {stock.change}%
+                </td>
+                <td className="p-2 text-cyan-400">{parseInt(stock.volume).toLocaleString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="p-3 border-t border-gray-700 flex justify-between items-center text-xs">
+          <span className="text-green-300">
+            Page {currentPage} of {totalPages} ({filteredData.length} results)
+          </span>
+          <div className="flex space-x-2">
+            <button
+              onClick={() => setPage(Math.max(1, currentPage - 1))}
+              disabled={currentPage === 1}
+              className="px-2 py-1 bg-gray-800 border border-green-500 text-green-400 rounded disabled:opacity-50"
+            >
+              Previous
+            </button>
+            <button
+              onClick={() => setPage(Math.min(totalPages, currentPage + 1))}
+              disabled={currentPage === totalPages}
+              className="px-2 py-1 bg-gray-800 border border-green-500 text-green-400 rounded disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
